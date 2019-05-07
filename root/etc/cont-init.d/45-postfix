@@ -1,4 +1,6 @@
 #!/usr/bin/with-contenv bash
+#
+set +x
 
 # Some of these docs have been pulled from Ubuntu docs:
 # https://help.ubuntu.com/lts/serverguide/postfix.html
@@ -10,6 +12,7 @@
 # the SMTP server will allow the client to relay mail.
 #
 
+echo "Configuring general postfix params"
 postconf -e 'smtpd_banner = $myhostname ESMTP $mail_name (tkf-docker-postfix)'
 postconf -e 'biff = no'
 
@@ -18,28 +21,29 @@ postconf -e 'biff = no'
 postconf -e 'append_dot_mydomain = no'
 
 # Configure the general settings
-postconf -e 'myhostname = ${MAILDOMAIN}'
+postconf -e myhostname=${MAILDOMAIN}
 postconf -e 'alias_maps = hash:/config/postfix/aliases'
 postconf -e 'alias_database = hash:/config/postfix/aliases'
 postconf -e 'myorigin = /etc/mailname'
 postconf -e 'mydestination = localhost'
-postconf -e 'relayhost = ${TKF_RELAY_HOST}'
+postconf -e relayhost=${TKF_RELAY_HOST}
 postconf -e 'mynetworks = 127.0.0.0/8'
 postconf -e 'mailbox_command = procmail -a "$EXTENSION"'
 postconf -e 'mailbox_size_limit = 0'
 postconf -e 'recipient_delimiter = +'
 postconf -e 'inet_interfaces = all'
 
+echo "Configuring postfix sasl params"
 postconf -e 'smtpd_sasl_type = dovecot'
 postconf -e 'smtpd_sasl_path = private/auth'
 postconf -e 'smtpd_sasl_local_domain ='
 postconf -e 'smtpd_sasl_security_options = noanonymous'
 postconf -e 'broken_sasl_auth_clients = yes'
 postconf -e 'smtpd_sasl_auth_enable = yes'
-postconf -e 'smtpd_recipient_restrictions = \
-              permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination'
+postconf -e 'smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination'
 
 # Setup the TLS bits
+echo "Configuring postfix TLS params"
 postconf -e 'smtp_tls_security_level = may'
 postconf -e 'smtpd_tls_security_level = may'
 postconf -e 'smtp_tls_note_starttls_offer = yes'

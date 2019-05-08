@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+
+#exec s6-setuidgid abc python /app/nginx-ldap-auth-daemon.py --host 0.0.0.0 --port 8888
+#exec s6-setuidgid abc /usr/bin/smokeping --config="/etc/smokeping/config" --nodaemon
+
+#INSTANCES=$(postmulti -l -a | awk '($3=="y") { print $1 }
+
+exec s6-setuidgid abc /usr/sbin/postmulti -- -i - -x /usr/sbin/posfix

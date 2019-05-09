@@ -1,5 +1,7 @@
 #!/usr/bin/with-contenv bash
 #
+#
+set -x
 
 # Some of these docs have been pulled from Ubuntu docs:
 # https://help.ubuntu.com/lts/serverguide/postfix.html
@@ -12,108 +14,107 @@
 #
 # main.cf parameter doc: http://www.postfix.org/postconf.5.html
 #
-CONF_DIR="/config/postfix/"
+CONF_DIR="/config/postfix"
 
-echo "Configuring general postfix params"
+if [ ! -f "${CONF_DIR}/main.cf" ]; then
+  touch "${CONF_DIR}/main.cf"
+fi
 
-# smtpd_banner
-# This is the banner displayed when connecting to the server.
-# Need to escape the right stuff here
-postconf -c ${CONF_DIR} -e smtpd_banner=${TKF_MAILDOMAIN}\ ESMTP\ Postfix\ \(tkf-docker-postfix\)
+function config_pf_general()
+{
+  echo "Configuring general postfix params"
 
-## biff
-# Whether or not to use the local biff service. This service sends "new mail" notifications to users who have requested new mail notification with the UNIX command "biff y".
-postconf -c ${CONF_DIR} -e "biff = no"
+  postconf -c ${CONF_DIR} -e smtpd_banner=${TKF_MAILDOMAIN}\ ESMTP\ Postfix\ \(tkf-docker-postfix\)
+  postconf -c ${CONF_DIR} -e biff=no
+  postconf -c ${CONF_DIR} -e smtp_always_send_ehlo=yes
+  postconf -c ${CONF_DIR} -e smtp_helo_name=${TKF_MAILDOMAIN}
+  postconf -c ${CONF_DIR} -e append_dot_mydomain=no
+  postconf -c ${CONF_DIR} -e myhostname=${TKF_MYHOSTNAME}
 
-##
-# smtp_always_send_ehlo
-# Always send EHLO at the start of an SMTP session. 
-postconf -c ${CONF_DIR} -e "smtp_always_send_ehlo = yes"
+  # Not sure /etc/mailname is actually configured in Alpine
+  postconf -c ${CONF_DIR} -e myorigin=/etc/mailname
 
-##
-#The hostname to send in the SMTP HELO or EHLO command. 
-postconf -c ${CONF_DIR} -e smtp_helo_name=${TKF_MAILDOMAIN}
+  # mydestination is 'what domains should we accept local mail for?'
+  postconf -c ${CONF_DIR} -e mydestination=localhost
 
-# Appending the .domain is the job of the MUA let's be a di^H^Hjerk
-# and not make it easy for them
-postconf -c ${CONF_DIR} -e 'append_dot_mydomain = no'
+  postconf -c ${CONF_DIR} -e mynetworks="${TKF_MYNETWORKS}"
+  postconf -c ${CONF_DIR} -e inet_interfaces=all
+}
 
-# Configure the general settings
-# myhostname
-# The internet hostname of this mail system. The default is to use the fully-qualified domain name (FQDN) from gethostname(), or to use the non-FQDN result from gethostname() and append ".$mydomain". $myhostname is used as a default value for many other configuration parameters. 
-postconf -c ${CONF_DIR} -e myhostname=${TKF_MYHOSTNAME}
+function config_pf_aliases()
+{
+  echo "Configuring aliases"
 
-##
-#alias_maps
-# The alias databases that are used for local(8) delivery. See aliases(5) for syntax details. Specify zero or more "type:name" lookup tables, separated by whitespace or comma. Tables will be searched in the specified order until a match is found. Note: these lookups are recursive.
-postconf -c ${CONF_DIR} -e 'alias_maps = hash:/config/postfix/aliases'
+  postconf -c ${CONF_DIR} -e alias_maps=hash:${CONF_DIR}/aliases
+  postconf -c ${CONF_DIR} -e alias_database=hash:${CONF_DIR}/aliases
 
-##
-#alias_database 
-# The alias databases for local(8) delivery that are updated with "newaliases" or with "sendmail -bi".
-#
-# This is a separate configuration parameter because not all the tables specified with $alias_maps have to be local files. 
-postconf -c ${CONF_DIR} -e 'alias_database = hash:/config/postfix/aliases'
-
-## 
-#myorigin
-# The domain name that locally-posted mail appears to come from, and that locally posted mail is delivered to. The default, $myhostname, is adequate for small sites. If you run a domain with multiple machines, you should (1) change this to $mydomain and (2) set up a domain-wide alias database that aliases each user to user@that.users.mailhost. 
-postconf -c ${CONF_DIR} -e 'myorigin = /etc/mailname'
-
-##
-#mydestination
-#The list of domains that are delivered via the $local_transport mail delivery transport. By default this is the Postfix local(8) delivery agent which looks up all recipients in /etc/passwd and /etc/aliases. The SMTP server validates recipient addresses with $local_recipient_maps and rejects non-existent recipients. See also the local domain class in the ADDRESS_CLASS_README file. 
-postconf -c ${CONF_DIR} -e 'mydestination = localhost'
-
-##
-#relayhost
-# The next-hop destination of non-local mail; overrides non-local domains in recipient addresses. This information is overruled with relay_transport, sender_dependent_default_transport_maps, default_transport, sender_dependent_relayhost_maps and with the transport(5) table.
-#
-# On an intranet, specify the organizational domain name. If your internal DNS uses no MX records, specify the name of the intranet gateway host instead.
-#
-# In the case of SMTP, specify a domain name, hostname, hostname:port, [hostname]:port, [hostaddress] or [hostaddress]:port. The form [hostname] turns off MX lookups. 
-postconf -c ${CONF_DIR} -e relayhost=${TKF_RELAY_HOST}
-
-##
-#mynetworks
-# The list of "trusted" remote SMTP clients that have more privileges than "strangers".
-#
-# In particular, "trusted" SMTP clients are allowed to relay mail through Postfix. See the smtpd_relay_restrictions parameter description in the postconf(5) manual. 
-postconf -c ${CONF_DIR} -e mynetworks="${TKF_MYNETWORKS}"
-
-## 
-#inet_interfaces
-#The network interface addresses that this mail system receives mail on. Specify "all" to receive mail on all network interfaces (default), and "loopback-only" to receive mail on loopback network interfaces only (Postfix version 2.2 and later). The parameter also controls delivery of mail to user@[ip.address].
-postconf -c ${CONF_DIR} -e 'inet_interfaces = all'
+  /usr/bin/newaliases -C ${CONF_DIR}
+}
 
 
-postconf -c ${CONF_DIR} -e 'smtpd_relay_restrictions=permit_mynetworks defer_unauth_destination'
+function config_pf_relay()
+{
+  echo "Configuring external relay"
 
-# Setup the TLS bits
-echo "Configuring postfix TLS params"
-postconf -c ${CONF_DIR} -e 'smtp_tls_security_level = encrypt'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_security_level = may'
-postconf -c ${CONF_DIR} -e 'smtp_tls_note_starttls_offer = yes'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_key_file = /config/ssl/server.key'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_cert_file = /config/ssl/server.crt'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_loglevel = 1'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_received_header = yes'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_session_cache_timeout = 3600s'
-postconf -c ${CONF_DIR} -e 'tls_random_source = /dev/urandom'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_auth_only = no'
-postconf -c ${CONF_DIR} -e 'smtpd_tls_CAfile = /config/ssl/CAcert.crt'
+  # relayhost is the next-hop destination for non-local mail.
+  # in other words, where do we send our mail out through so
+  # we don't have to try to deliver it ourselves
+  # Our relay host is set in the docker image via an enviornment
+  # vairable that is passed in - TKF_RELAY_HOST
+  postconf -c ${CONF_DIR} -e relayhost=${TKF_RELAY_HOST}
 
-postconf -c ${CONF_DIR} -e smtp_sasl_auth_enable=yes
-postconf -c ${CONF_DIR} -e smtp_sasl_password_maps=hash:/config/postfix/relay_passwords
-postconf -c ${CONF_DIR} -e smtp_sasl_security_options=noanonymous
-postconf -c ${CONF_DIR} -e smtp_use_tls=yes
-postconf -c ${CONF_DIR} -e smtp_tls_note_starttls_offer=yes
+  # smtpd_relay_restrictions sets who can actually relay through
+  # this host. My assumption for now is that anyone connecting from
+  # 'mynetworks' is allowed. Those should be local addresses/networks
+  postconf -c ${CONF_DIR} -e 'smtpd_relay_restrictions=permit_mynetworks defer_unauth_destination'
+}
 
-/usr/bin/newaliases -C /config/postfix 
+function config_pf_tls()
+{
+  echo "Configuring postfix TLS settings"
 
-# add testing here
-echo $TKF_RELAY_PASSWORD > /config/postfix/relay_passwords
-chmod 400 /config/postfix/relay_passwords
-postmap /config/postfix/relay_passwords
-# rm -f /config/postfix/relay_passwords
-chmod 0600 /config/postfix/relay_passwords.db
+  # If the server that this postfix connects to says it does STARTTLS
+  # let's try to use it. Note: I actually think we should be using
+  # smtp_tls_security_level instead, not sure what happens when both
+  # are configured?
+  postconf -c ${CONF_DIR} -e smtp_use_tls=yes
+
+  postconf -c ${CONF_DIR} -e smtp_tls_security_level=encrypt
+  postconf -c ${CONF_DIR} -e smtpd_tls_security_level=may
+  #postconf -c ${CONF_DIR} -e smtp_tls_note_starttls_offer=yes
+
+  postconf -c ${CONF_DIR} -e smtpd_tls_key_file=/config/ssl/server.key
+  postconf -c ${CONF_DIR} -e smtpd_tls_cert_file=/config/ssl/server.crt
+  postconf -c ${CONF_DIR} -e smtpd_tls_CAfile=/config/ssl/CAcert.crt
+  postconf -c ${CONF_DIR} -e smtpd_tls_loglevel=1
+  #postconf -c ${CONF_DIR} -e 'smtpd_tls_received_header = yes'
+  #postconf -c ${CONF_DIR} -e 'smtpd_tls_session_cache_timeout = 3600s'
+  #postconf -c ${CONF_DIR} -e 'tls_random_source = /dev/urandom'
+  #postconf -c ${CONF_DIR} -e 'smtpd_tls_auth_only = no'
+}
+
+function config_pf_sasl()
+{
+  echo "Configuring SASL parameters"
+
+  # Note: I *really* dont like passing this in via env variables
+  # One option is to pull this information via Vault,
+  # But it is unlikely that other users have vault.
+  # Might want to remove this fromt he env also after we protect it?
+  echo ${TKF_RELAY_PASSWORD} > ${CONF_DIR}/relay_passwords
+  postmap ${CONF_DIR}/relay_passwords
+  rm -f ${CONF_DIR}/relay_passwords
+  chmod 0600 ${CONF_DIR}/relay_passwords.db
+
+  postconf -c ${CONF_DIR} -e smtp_sasl_auth_enable=yes
+  postconf -c ${CONF_DIR} -e smtp_sasl_password_maps=hash:/config/postfix/relay_passwords
+  postconf -c ${CONF_DIR} -e smtp_sasl_security_options=noanonymous
+  postconf -c ${CONF_DIR} -e smtp_tls_note_starttls_offer=yes
+}
+
+
+config_pf_general
+config_pf_aliases
+config_pf_relay
+config_pf_tls
+config_pf_sasl

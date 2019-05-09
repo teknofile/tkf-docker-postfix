@@ -11,3 +11,7 @@ Things to make the Docker image do:
 * use postconf to setup smtps
 * make rsyslog.conf come out of the /config dir
 * auto regen the newaliases on container start
+* Testing!!!
+  * Let's make sure that not everyone with a valid cert to the world can relay
+  * Let's make sure that only authenticated users can relay (right now - everyone on the lcoal network can)
+  * Let's make sure we support tls. no sense in not using encryption

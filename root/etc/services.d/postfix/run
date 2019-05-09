@@ -5,4 +5,4 @@
 
 #INSTANCES=$(postmulti -l -a | awk '($3=="y") { print $1 }
 
-exec s6-setuidgid root /usr/libexec/postfix/master -c /etc/postfix -d 2>&1
+exec s6-setuidgid root /usr/libexec/postfix/master -c /config/postfix -d 2>&1

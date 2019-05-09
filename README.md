@@ -11,3 +11,4 @@ Things to make the Docker image do:
 * Setip clamav scanning of mail
 * use postconf to setup smtps
 * make rsyslog.conf come out of the /config dir
+* auto regen the newaliases on container start

@@ -22,7 +22,10 @@ RUN  echo "**** Installing Runtime Packages ****" && \
     mailx \
     bash \
     ca-certificates \
-    libsasl
+    libsasl \
+    cyrus-sasl \
+    cyrus-sasl-digestmd5 \
+    cyrus-sasl-plain
 
 #RUN  echo "**** Clean up ****" && \
 #  apk del --purge \

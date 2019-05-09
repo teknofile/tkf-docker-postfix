@@ -4,33 +4,11 @@ This docker image is intended to handle the SMTP portions of mail for a small si
 
 The image is derived from the LinuxServer base image, which in turn is based off of Alpine linux.
 
-== TODO ==
-
-Things to make the Docker image do:
-
-* Local Maildir/ should be mounted into the docker container via -v param
-  * Only if we care about local mail storage tho?
-* validate the /etc/mailname is the right thing to set for myorigin, i dont think it exists
-* configure relaying (smarthost)
-* Setup a spamassassin filter (or other filter? bogo?)
-* Setip clamav scanning of mail
-* use postconf to setup smtps
-* make rsyslog.conf come out of the /config dir
-* auto regen the newaliases on container start
-* Testing!!!
-  * Let's make sure that not everyone with a valid cert to the world can relay
-  * Let's make sure that only authenticated users can relay (right now - everyone on the lcoal network can)
-  * Let's make sure we support tls. no sense in not using encryption
-* Think about mail spool dir's - expose to the container host? Pros/cons?
-* omg the configuration needs to be massively cleaned up
-* I'm pretty sure it'll break on a new install unless a default set of posfix configs are already in /config/postfix
-
-
 # tkf-docker-postfix
 
 This container is currently used to act as a small mail relay for an internal network out. It has support for TLS and relaying through an external mail server. Currently, the container allows mail to be relayed by all networks defined in 'mynetworks'. One day, with many PRs to come, I hope to add functionality to recieve and 'store' mail for a small network.
 
-This image is based off of the <a href="https://github.com/linuxserver/">LinuxServer.io</a> teams' <a href="https://hub.docker.com/r/lsiobase/alpine">lsiobase-alpine image</a> and as such is a really small image. 
+This image is based off of the [LinuxServer.io](https://github.com/linuxserver/) teams' [lsiobase-alpine image](https://hub.docker.com/r/lsiobase/alpine) and as such is a really small image. 
 
 ## Getting Started
 

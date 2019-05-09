@@ -1,3 +1,9 @@
+tkf-docker-postifx
+
+This docker image is intended to handle the SMTP portions of mail for a small site. I use this personally, internally, for my home network so that each host can relay mail through it out to the internet. Much work still needs to be done.
+
+The image is derived from the LinuxServer base image, which in turn is based off of Alpine linux.
+
 == TODO ==
 
 Things to make the Docker image do:
@@ -15,3 +21,5 @@ Things to make the Docker image do:
   * Let's make sure that not everyone with a valid cert to the world can relay
   * Let's make sure that only authenticated users can relay (right now - everyone on the lcoal network can)
   * Let's make sure we support tls. no sense in not using encryption
+* Think about mail spool dir's - expose to the container host? Pros/cons?
+* omg the configuration needs to be massively cleaned up

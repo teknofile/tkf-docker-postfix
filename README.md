@@ -1,9 +1,3 @@
-tkf-docker-postifx
-
-This docker image is intended to handle the SMTP portions of mail for a small site. I use this personally, internally, for my home network so that each host can relay mail through it out to the internet. Much work still needs to be done.
-
-The image is derived from the LinuxServer base image, which in turn is based off of Alpine linux.
-
 # tkf-docker-postfix
 
 This container is currently used to act as a small mail relay for an internal network out. It has support for TLS and relaying through an external mail server. Currently, the container allows mail to be relayed by all networks defined in 'mynetworks'. One day, with many PRs to come, I hope to add functionality to recieve and 'store' mail for a small network.

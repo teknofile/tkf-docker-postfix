@@ -23,3 +23,4 @@ Things to make the Docker image do:
   * Let's make sure we support tls. no sense in not using encryption
 * Think about mail spool dir's - expose to the container host? Pros/cons?
 * omg the configuration needs to be massively cleaned up
+* I'm pretty sure it'll break on a new install unless a default set of posfix configs are already in /config/postfix

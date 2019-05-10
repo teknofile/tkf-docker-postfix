@@ -3,9 +3,11 @@ pipeline {
     label 'X86-64-MULTI'
   }
   // Input to determine if this is a package check
+/*
   parameters {
      string(defaultValue: 'false', description: 'package check run', name: 'PACKAGE_CHECK')
   }
+*/
   // Configuration for the variables used for this specific repo
   environment {
     GITHUB_TOKEN=credentials('498b4638-2d02-4ce5-832d-8a57d01d97ab')
@@ -408,6 +410,7 @@ pipeline {
       }
     }
     // Exit the build if this is just a package check and there are no changes to push
+/*
     stage('PACKAGECHECK-exit') {
       when {
         branch "master"
@@ -424,6 +427,7 @@ pipeline {
         }
       }
     }
+*/
     /* #######
        Testing
        ####### */

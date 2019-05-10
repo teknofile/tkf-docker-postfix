@@ -11,6 +11,7 @@ pipeline {
   // Configuration for the variables used for this specific repo
   environment {
     GITHUB_TOKEN=credentials('498b4638-2d02-4ce5-832d-8a57d01d97ab')
+    GITHUB_TOKEN=credentials('498b4638-2d02-4ce5-832d-8a57d01d97ab')
     BUILD_VERSION_ARG = 'SMOKEPING_VERSION'
     LS_USER = 'teknofile'
     LS_REPO = 'tkf-docker-postfix'
@@ -167,6 +168,7 @@ pipeline {
         }
       }
     }
+/*
     // Run ShellCheck
     stage('ShellCheck') {
       when {
@@ -196,6 +198,7 @@ pipeline {
         }
       }
     }
+*/
     // Use helper containers to render templated files
     stage('Update-Templates') {
       when {

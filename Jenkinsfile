@@ -8,15 +8,14 @@ pipeline {
   }
   // Configuration for the variables used for this specific repo
   environment {
-    BUILDS_DISCORD=credentials('build_webhook_url')
     GITHUB_TOKEN=credentials('498b4638-2d02-4ce5-832d-8a57d01d97ab')
     BUILD_VERSION_ARG = 'SMOKEPING_VERSION'
-    LS_USER = 'linuxserver'
-    LS_REPO = 'docker-smokeping'
-    CONTAINER_NAME = 'smokeping'
-    DOCKERHUB_IMAGE = 'linuxserver/smokeping'
-    DEV_DOCKERHUB_IMAGE = 'lsiodev/smokeping'
-    PR_DOCKERHUB_IMAGE = 'lspipepr/smokeping'
+    LS_USER = 'teknofile'
+    LS_REPO = 'tkf-docker-postfix'
+    CONTAINER_NAME = 'tkf-docker-postfix'
+    DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix'
+    DEV_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:devel'
+    PR_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:pr'
     DIST_IMAGE = 'alpine'
     MULTIARCH='true'
     CI='true'
@@ -24,7 +23,7 @@ pipeline {
     CI_PORT='80'
     CI_SSL='false'
     CI_DELAY='120'
-    CI_DOCKERENV='TZ=US/Pacific'
+    CI_DOCKERENV='TZ=US/Mountain'
     CI_AUTH='user:password'
     CI_WEBPATH='/smokeping/smokeping.cgi'
   }
@@ -628,28 +627,6 @@ pipeline {
       steps {
         sh '''curl -H "Authorization: token ${GITHUB_TOKEN}" -X POST https://api.github.com/repos/${LS_USER}/${LS_REPO}/issues/${PULL_REQUEST}/comments \
         -d '{"body": "I am a bot, here are the test results for this PR: \\n'${CI_URL}' \\n'${SHELLCHECK_URL}'"}' '''
-      }
-    }
-  }
-  /* ######################
-     Send status to Discord
-     ###################### */
-  post {
-    always {
-      script{
-        if (env.EXIT_STATUS == "ABORTED"){
-          sh 'echo "build aborted"'
-        }
-        else if (currentBuild.currentResult == "SUCCESS"){
-          sh ''' curl -X POST --data '{"avatar_url": "https://wiki.jenkins-ci.org/download/attachments/2916393/headshot.png","embeds": [{"color": 1681177,\
-                 "description": "**Build:**  '${BUILD_NUMBER}'\\n**CI Results:**  '${CI_URL}'\\n**ShellCheck Results:**  '${SHELLCHECK_URL}'\\n**Status:**  Success\\n**Job:** '${RUN_DISPLAY_URL}'\\n**Change:** '${CODE_URL}'\\n**External Release:**: '${RELEASE_LINK}'\\n**DockerHub:** '${DOCKERHUB_LINK}'\\n"}],\
-                 "username": "Jenkins"}' ${BUILDS_DISCORD} '''
-        }
-        else {
-          sh ''' curl -X POST --data '{"avatar_url": "https://wiki.jenkins-ci.org/download/attachments/2916393/headshot.png","embeds": [{"color": 16711680,\
-                 "description": "**Build:**  '${BUILD_NUMBER}'\\n**CI Results:**  '${CI_URL}'\\n**ShellCheck Results:**  '${SHELLCHECK_URL}'\\n**Status:**  failure\\n**Job:** '${RUN_DISPLAY_URL}'\\n**Change:** '${CODE_URL}'\\n**External Release:**: '${RELEASE_LINK}'\\n**DockerHub:** '${DOCKERHUB_LINK}'\\n"}],\
-                 "username": "Jenkins"}' ${BUILDS_DISCORD} '''
-        }
       }
     }
   }

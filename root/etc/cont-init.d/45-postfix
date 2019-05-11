@@ -17,7 +17,9 @@ set -x
 CONF_DIR="/config/postfix"
 
 if [ ! -f "${CONF_DIR}/main.cf" ]; then
-  touch "${CONF_DIR}/main.cf"
+#  touch "${CONF_DIR}/main.cf"
+#  Add better testing here
+  cp -a /bootstrap/postfix/* /config/
 fi
 
 function config_pf_general()

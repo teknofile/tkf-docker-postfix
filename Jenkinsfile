@@ -442,6 +442,7 @@ pipeline {
        Testing
        ####### */
     // Run Container tests
+    /*
     stage('Test') {
       when {
         environment name: 'CI', value: 'true'
@@ -486,6 +487,7 @@ pipeline {
         }
       }
     }
+    */
     /* ##################
          Release Logic
        ################## */

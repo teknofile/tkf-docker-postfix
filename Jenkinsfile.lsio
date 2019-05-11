@@ -2,8 +2,15 @@ pipeline {
   agent {
     label 'X86-64-MULTI'
   }
+  // Input to determine if this is a package check
+/*
+  parameters {
+     string(defaultValue: 'false', description: 'package check run', name: 'PACKAGE_CHECK')
+  }
+*/
   // Configuration for the variables used for this specific repo
   environment {
+    //GITHUB_TOKEN=credentials('498b4638-2d02-4ce5-832d-8a57d01d97ab')
     GITHUB_TOKEN=credentials('tkf-github-auth-token')
     BUILD_VERSION_ARG = 'TKF_DOCKER_POSTFIX_VERSION'
     LS_USER = 'teknofile'
@@ -13,7 +20,6 @@ pipeline {
     DEV_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix'
     PR_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:pr'
     DIST_IMAGE = 'alpine'
-
     // During testing, I want to set multiarch to false so we only try to build the x86 version
     MULTIARCH='false'
     CI='true'
@@ -414,6 +420,24 @@ pipeline {
       }
     }
     // Exit the build if this is just a package check and there are no changes to push
+/*
+    stage('PACKAGECHECK-exit') {
+      when {
+        branch "master"
+        environment name: 'CHANGE_ID', value: ''
+        environment name: 'PACKAGE_UPDATED', value: 'false'
+        environment name: 'EXIT_STATUS', value: ''
+        expression {
+          params.PACKAGE_CHECK == 'true'
+        }
+      }
+      steps {
+        script{
+          env.EXIT_STATUS = 'ABORTED'
+        }
+      }
+    }
+*/
     /* #######
        Testing
        ####### */

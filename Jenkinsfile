@@ -20,7 +20,8 @@ pipeline {
     DEV_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:devel'
     PR_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:pr'
     DIST_IMAGE = 'alpine'
-    MULTIARCH='true'
+    // During testing, I want to set multiarch to false so we only try to build the x86 version
+    MULTIARCH='false'
     CI='true'
     CI_WEB='true'
     CI_PORT='80'

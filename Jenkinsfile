@@ -305,7 +305,7 @@ pipeline {
             withCredentials([
               [
                 $class: 'UsernamePasswordMultiBinding',
-                credentialsId: '3f9ba4d5-100d-45b0-a3c4-633fd6061207',
+                credentialsId: 'teknofile-docker-creds',
                 usernameVariable: 'DOCKERUSER',
                 passwordVariable: 'DOCKERPASS'
               ]
@@ -332,7 +332,7 @@ pipeline {
             withCredentials([
               [
                 $class: 'UsernamePasswordMultiBinding',
-                credentialsId: '3f9ba4d5-100d-45b0-a3c4-633fd6061207',
+                credentialsId: 'teknofile-docker-creds',
                 usernameVariable: 'DOCKERUSER',
                 passwordVariable: 'DOCKERPASS'
               ]
@@ -501,7 +501,7 @@ pipeline {
         withCredentials([
           [
             $class: 'UsernamePasswordMultiBinding',
-            credentialsId: '3f9ba4d5-100d-45b0-a3c4-633fd6061207',
+            credentialsId: 'teknofile-docker-creds',
             usernameVariable: 'DOCKERUSER',
             passwordVariable: 'DOCKERPASS'
           ]
@@ -530,7 +530,7 @@ pipeline {
         withCredentials([
           [
             $class: 'UsernamePasswordMultiBinding',
-            credentialsId: '3f9ba4d5-100d-45b0-a3c4-633fd6061207',
+            credentialsId: 'teknofile-docker-creds',
             usernameVariable: 'DOCKERUSER',
             passwordVariable: 'DOCKERPASS'
           ]
@@ -616,7 +616,7 @@ pipeline {
         withCredentials([
           [
             $class: 'UsernamePasswordMultiBinding',
-            credentialsId: '3f9ba4d5-100d-45b0-a3c4-633fd6061207',
+            credentialsId: 'teknofile-docker-creds',
             usernameVariable: 'DOCKERUSER',
             passwordVariable: 'DOCKERPASS'
           ]

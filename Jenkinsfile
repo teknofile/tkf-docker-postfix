@@ -17,7 +17,7 @@ pipeline {
     LS_REPO = 'tkf-docker-postfix'
     CONTAINER_NAME = 'tkf-docker-postfix'
     DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix'
-    DEV_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:devel'
+    DEV_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix'
     PR_DOCKERHUB_IMAGE = 'teknofile/tkf-docker-postfix:pr'
     DIST_IMAGE = 'alpine'
     // During testing, I want to set multiarch to false so we only try to build the x86 version
@@ -513,7 +513,7 @@ pipeline {
           //sh "docker tag ${IMAGE}:${META_TAG} ${IMAGE}:latest"
           sh "docker tag ${IMAGE} ${IMAGE}:latest"
           sh "docker push ${IMAGE}:latest"
-          sh "docker push ${IMAGE}:${META_TAG}"
+          //sh "docker push ${IMAGE}:${META_TAG}"
           sh '''docker rmi \
                 ${IMAGE}:${META_TAG} \
                 ${IMAGE}:latest || :'''

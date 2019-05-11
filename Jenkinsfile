@@ -12,7 +12,7 @@ pipeline {
   environment {
     //GITHUB_TOKEN=credentials('498b4638-2d02-4ce5-832d-8a57d01d97ab')
     GITHUB_TOKEN=credentials('tkf-github-auth-token')
-    BUILD_VERSION_ARG = 'SMOKEPING_VERSION'
+    BUILD_VERSION_ARG = 'TKF_DOCKER_POSTFIX_VERSION'
     LS_USER = 'teknofile'
     LS_REPO = 'tkf-docker-postfix'
     CONTAINER_NAME = 'tkf-docker-postfix'
@@ -273,9 +273,15 @@ pipeline {
         environment name: 'EXIT_STATUS', value: ''
       }
       steps {
+        sh "docker build --no-cache --pull -t ${IMAGE} \
+        --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION=\"${META_TAG}\" --build-arg BUILD_DATE=${GITHUB_DATE} ."
+      }
+      /*
+      steps {
         sh "docker build --no-cache --pull -t ${IMAGE}:${META_TAG} \
         --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION=\"${META_TAG}\" --build-arg BUILD_DATE=${GITHUB_DATE} ."
       }
+      */
     }
     // Build MultiArch Docker containers for push to LS Repo
     stage('Build-Multi') {

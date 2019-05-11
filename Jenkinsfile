@@ -510,7 +510,8 @@ pipeline {
           sh '''#! /bin/bash
              echo $DOCKERPASS | docker login -u $DOCKERUSER --password-stdin
              '''
-          sh "docker tag ${IMAGE}:${META_TAG} ${IMAGE}:latest"
+          #sh "docker tag ${IMAGE}:${META_TAG} ${IMAGE}:latest"
+          sh "docker tag ${IMAGE} ${IMAGE}:latest"
           sh "docker push ${IMAGE}:latest"
           sh "docker push ${IMAGE}:${META_TAG}"
           sh '''docker rmi \

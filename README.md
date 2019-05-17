@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9d66b76c3fa4862866661b874e4839b)](https://www.codacy.com/app/teknofile/tkf-docker-postfix?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=teknofile/tkf-docker-postfix&amp;utm_campaign=Badge_Grade)
+
 # tkf-docker-postfix
 
 This container is currently used to act as a small mail relay for an internal network out. It has support for TLS and relaying through an external mail server. Currently, the container allows mail to be relayed by all networks defined in 'mynetworks'. One day, with many PRs to come, I hope to add functionality to recieve and 'store' mail for a small network.

@@ -109,7 +109,7 @@ function config_pf_sasl()
   chmod 0600 ${CONF_DIR}/relay_passwords.db
 
   postconf -c ${CONF_DIR} -e smtp_sasl_auth_enable=yes
-  postconf -c ${CONF_DIR} -e smtp_sasl_password_maps=hash:/config/postfix/relay_passwords
+  postconf -c ${CONF_DIR} -e smtp_sasl_password_maps=hash:/config/relay_passwords
   postconf -c ${CONF_DIR} -e smtp_sasl_security_options=noanonymous
   postconf -c ${CONF_DIR} -e smtp_tls_note_starttls_offer=yes
 }

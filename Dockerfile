@@ -1,4 +1,5 @@
 FROM lsiobase/alpine:3.9
+MAINTAINER teknofile <teknofile@teknofile.org>
 
 ENV MAILDOMAIN="copperdale.teknofile.net"
 

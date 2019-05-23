@@ -14,10 +14,12 @@ set -x
 #
 # main.cf parameter doc: http://www.postfix.org/postconf.5.html
 #
-CONF_DIR="/config/postfix"
+CONF_DIR="/config"
 
 if [ ! -f "${CONF_DIR}/main.cf" ]; then
-  touch "${CONF_DIR}/main.cf"
+#  touch "${CONF_DIR}/main.cf"
+#  Add better testing here
+  cp -a /bootstrap/postfix/* /config/
 fi
 
 function config_pf_general()
@@ -67,6 +69,28 @@ function config_pf_relay()
   # this host. My assumption for now is that anyone connecting from
   # 'mynetworks' is allowed. Those should be local addresses/networks
   postconf -c ${CONF_DIR} -e 'smtpd_relay_restrictions=permit_mynetworks defer_unauth_destination'
+
+  cat << EOF >> ${CONF_DIR}/main.cf
+
+  smtpd_recipient_restrictions =
+    check_client_access hash:${CONF_DIR}/helo_client_exceptions,
+    check_sender_access hash:${CONF_DIR}/sender_checks,
+    reject_invalid_hostname,
+    reject_non_fqdn_hostname,
+    reject_non_fqdn_sender,
+    reject_non_fqdn_recipient,
+    reject_unknown_sender_domain,
+    reject_unknown_recipient_domain,
+    permit_mynetworks,
+    reject_unauth_destination,
+    check_client_access hash:${CONF_DIR}/rbl_client_exceptions,
+    reject_rbl_client cbl.abuseat.org,
+    reject_rbl_client sbl-xbl.spamhaus.org,
+    reject_rbl_client bl.spamcop.net,
+    reject_rhsbl_sender dsn.rfc-gnorant.org,
+    permit
+
+  EOF
 }
 
 function config_pf_tls()
@@ -107,7 +131,7 @@ function config_pf_sasl()
   chmod 0600 ${CONF_DIR}/relay_passwords.db
 
   postconf -c ${CONF_DIR} -e smtp_sasl_auth_enable=yes
-  postconf -c ${CONF_DIR} -e smtp_sasl_password_maps=hash:/config/postfix/relay_passwords
+  postconf -c ${CONF_DIR} -e smtp_sasl_password_maps=hash:/config/relay_passwords
   postconf -c ${CONF_DIR} -e smtp_sasl_security_options=noanonymous
   postconf -c ${CONF_DIR} -e smtp_tls_note_starttls_offer=yes
 }

@@ -1,15 +1,12 @@
 FROM lsiobase/alpine:3.9
 LABEL MAINTAINER teknofile <teknofile@teknofile.org>
 
-ENV MAILDOMAIN="copperdale.teknofile.net"
-
-
-#RUN \
-#  echo "**** Installing Build Packages ****" && \
-#
-#  apk add --no-cache --virtual=build-dependencies \
-#    build-base \
-#    libffi-dev 
+ENV TZ
+ENV TKF_MAILDOMAIN
+ENV TKF_RELAY_HOST
+ENV TKF_MYNETWORKS
+ENV TKF_RELAY_PASSWORD
+ENV TKF_MYHOSTNAME
 
 RUN  echo "**** Installing Runtime Packages ****" && \
   apk add --no-cache \
@@ -28,16 +25,10 @@ RUN  echo "**** Installing Runtime Packages ****" && \
     cyrus-sasl-digestmd5 \
     cyrus-sasl-plain
 
-#RUN  echo "**** Clean up ****" && \
-#  apk del --purge \
-#    build-dependencies && \
-#  rm -rf \
-#    /tmp/* 
-
 
 # Copy local files over
 COPY root/ /
 
 # Ports to expose
-EXPOSE 25 465
-VOLUME /config /Maildir
+EXPOSE 25
+VOLUME /config 

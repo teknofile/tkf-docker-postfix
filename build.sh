@@ -2,9 +2,9 @@
 
 docker create \
   --name=tkf-postfix \
-  -e PUID=11 \
-  -e PGID=952 \
-  -e TZ=US/Mountain \
+  -e PUID=$(id -u) \
+  -e PGID=$(id -g)  \
+  -e TZ=America/Denver \
   -e TKF_MAILDOMAIN=copperdale.teknofile.net \
   -e TKF_RELAY_HOST="$(cat ./tkf.relayhost)" \
   -e TKF_MYNETWORKS="$(cat ./tkf.mynetworks)" \
@@ -13,5 +13,5 @@ docker create \
   -v /mnt/usb/docker/tkf-postfix/:/config \
   -p 25:25 \
   --restart unless-stopped \
-  --net=tkfdocker \
+  --net=tkf-services \
   teknofile/tkf-docker-postfix:devel

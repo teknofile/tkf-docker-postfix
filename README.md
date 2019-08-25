@@ -10,7 +10,7 @@ This image is based off of the [LinuxServer.io](https://github.com/linuxserver/)
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-This image is still in testing. I have released v0.1.0, as a beta quality release. Please use at your own risk. I take no responsibility for anything that may go wrong or right for you. 
+This image is still in testing! I have released v0.1.0, as a beta quality release. Please use at your own risk. I take no responsibility for anything that may go wrong or right for you. 
 
 To get started, <a href="https://github.com/teknofile/tkf-docker-postfix/releases/tag/v0.1.0">download the code</a>, build the container and run it. Included is a ```build.sh``` sciprt that you can use as an example. A few envoirnment variables can be set to configure the container for mail handling.
 

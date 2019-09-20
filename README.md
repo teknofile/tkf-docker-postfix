@@ -18,7 +18,6 @@ To get started, <a href="https://github.com/teknofile/tkf-docker-postfix/release
 
 Really all that should be needed is a recent version of Docker (I have been testing with Docker version 18.09.6).
 
-
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
